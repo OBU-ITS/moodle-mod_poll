@@ -23,35 +23,34 @@
  *
  */
 
-require('../../config.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/lib.php');
 
-$id = required_param('id', PARAM_INT); // course id
+$id = required_param('id', PARAM_INT); // Course.
 
-$course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
-require_course_login($course, true);
-$PAGE->set_pagelayout('incourse');
+require_course_login($course);
 
-// Trigger instances list viewed event.
-$event = \mod_poll\event\course_module_instance_list_viewed::create(array('context' => context_course::instance($course->id)));
+$params = array(
+    'context' => context_course::instance($course->id)
+);
+$event = \mod_poll\event\course_module_instance_list_viewed::create($params);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
-$strpoll = get_string('modulename', 'poll');
-$strpolls = get_string('modulenameplural', 'poll');
-$strname = get_string('name');
-$strintro = get_string('moduleintro');
-$strlastmodified = get_string('lastmodified');
-
-$PAGE->set_url('/mod/poll/index.php', array('id' => $course->id));
-$PAGE->set_title($course->shortname.': '.$strpolls);
+$strname = get_string('modulenameplural', 'mod_poll');
+$PAGE->set_url('/mod/poll/index.php', array('id' => $id));
+$PAGE->navbar->add($strname);
+$PAGE->set_title("$course->shortname: $strname");
 $PAGE->set_heading($course->fullname);
-$PAGE->navbar->add($strpolls);
+$PAGE->set_pagelayout('incourse');
+
 echo $OUTPUT->header();
-echo $OUTPUT->heading($strpolls);
+echo $OUTPUT->heading($strname);
+
 if (!$polls = get_all_instances_in_course('poll', $course)) {
-    notice(get_string('thereareno', 'moodle', $strpolls), "$CFG->wwwroot/course/view.php?id=$course->id");
-    exit;
+    notice(get_string('nopolls', 'poll'), new moodle_url('/course/view.php', array('id' => $course->id)));
 }
 
 $usesections = course_format_uses_sections($course->format);
@@ -61,38 +60,34 @@ $table->attributes['class'] = 'generaltable mod_index';
 
 if ($usesections) {
     $strsectionname = get_string('sectionname', 'format_'.$course->format);
-    $table->head  = array ($strsectionname, $strname, $strintro);
-    $table->align = array ('center', 'left', 'left');
+    $table->head  = array ($strsectionname, $strname);
+    $table->align = array ('center', 'left');
 } else {
-    $table->head  = array ($strlastmodified, $strname, $strintro);
-    $table->align = array ('left', 'left', 'left');
+    $table->head  = array ($strname);
+    $table->align = array ('left');
 }
 
 $modinfo = get_fast_modinfo($course);
 $currentsection = '';
-foreach ($polls as $poll) {
-    $cm = $modinfo->cms[$poll->coursemodule];
+foreach ($modinfo->instances['poll'] as $cm) {
+    $row = array();
     if ($usesections) {
-        $printsection = '';
-        if ($poll->section !== $currentsection) {
-            if ($poll->section) {
-                $printsection = get_section_name($course, $poll->section);
+        if ($cm->sectionnum !== $currentsection) {
+            if ($cm->sectionnum) {
+                $row[] = get_section_name($course, $cm->sectionnum);
             }
             if ($currentsection !== '') {
                 $table->data[] = 'hr';
             }
-            $currentsection = $poll->section;
+            $currentsection = $cm->sectionnum;
         }
-    } else {
-        $printsection = '<span class="smallinfo">' . userdate($poll->timemodified) . "</span>";
     }
 
-    $class = $poll->visible ? '' : 'class="dimmed"'; // hidden modules are dimmed
+    $class = $cm->visible ? null : array('class' => 'dimmed');
 
-    $table->data[] = array (
-        $printsection,
-        "<a $class href=\"view.php?id=$cm->id\">".format_string($poll->name)."</a>",
-        format_module_intro('poll', $poll, $cm->id));
+    $row[] = html_writer::link(new moodle_url('view.php', array('id' => $cm->id)),
+                $cm->get_formatted_name(), $class);
+    $table->data[] = $row;
 }
 
 echo html_writer::table($table);

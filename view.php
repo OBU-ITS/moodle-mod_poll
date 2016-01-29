@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Poll activity - poll view
+ * Poll activity - view an instance of a poll
  *
  * @package    mod_poll
  * @author     Peter Welham
@@ -23,75 +23,63 @@
  *
  */
 
-require('../../config.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/lib.php');
 require_once($CFG->dirroot . '/mod/poll/locallib.php');
-require_once($CFG->libdir . '/completionlib.php');
 
-$id = optional_param('id', 0, PARAM_INT); // Course Module ID
-$p = optional_param('p', 0, PARAM_INT);  // Poll instance ID
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID or ...
+$p = optional_param('p', 0, PARAM_INT);  // ... poll instance ID.
+
+if ($id) {
+    $cm = get_coursemodule_from_id('poll', $id, 0, false, MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $poll = $DB->get_record('poll', array('id' => $cm->instance), '*', MUST_EXIST);
+} else if ($p) {
+    $poll = $DB->get_record('poll', array('id' => $p), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $poll->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('poll', $poll->id, $course->id, false, MUST_EXIST);
+} else {
+    error('You must specify a course_module ID or an instance ID');
+}
+
 $inpopup = optional_param('inpopup', 0, PARAM_BOOL);
 
-if ($p) {
-    if (!$poll = $DB->get_record('poll', array('id' => $p))) {
-        print_error('invalidaccessparameter');
-    }
-    $cm = get_coursemodule_from_instance('poll', $poll->id, $poll->course, false, MUST_EXIST);
-} else {
-    if (!$cm = get_coursemodule_from_id('poll', $id)) {
-        print_error('invalidcoursemodule');
-    }
-    $poll = $DB->get_record('poll', array('id' => $cm->instance), '*', MUST_EXIST);
-}
+require_login($course, true, $cm);
 
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-
-require_course_login($course, true, $cm);
-$context = context_module::instance($cm->id);
-require_capability('mod/poll:view', $context);
-
-// Trigger module viewed event.
 $event = \mod_poll\event\course_module_viewed::create(array(
-   'objectid' => $poll->id,
-   'context' => $context
+    'objectid' => $PAGE->cm->instance,
+    'context' => $PAGE->context,
 ));
-$event->add_record_snapshot('course_modules', $cm);
-$event->add_record_snapshot('course', $course);
-$event->add_record_snapshot('poll', $poll);
+$event->add_record_snapshot('course', $PAGE->course);
+$event->add_record_snapshot($PAGE->cm->modname, $poll);
 $event->trigger();
 
-// Update 'viewed' state if required by completion system
-require_once($CFG->libdir . '/completionlib.php');
-$completion = new completion_info($course);
-$completion->set_module_viewed($cm);
+// Print the page header.
 
 $PAGE->set_url('/mod/poll/view.php', array('id' => $cm->id));
-
-$options = empty($poll->displayoptions) ? array() : unserialize($poll->displayoptions);
-
 if ($inpopup and $poll->display == RESOURCELIB_DISPLAY_POPUP) {
     $PAGE->set_pagelayout('popup');
-    $PAGE->set_title($course->shortname . ': ' . $poll->name);
-    $PAGE->set_heading($course->fullname);
 } else {
-    $PAGE->set_title($course->shortname . ': ' . $poll->name);
-    $PAGE->set_heading($course->fullname);
     $PAGE->set_activity_record($poll);
 }
+$PAGE->set_title($course->shortname . ': ' . format_string($poll->name));
+$PAGE->set_heading(format_string($course->fullname));
+
+// Output starts here.
 echo $OUTPUT->header();
-if (!isset($options['printheading']) || !empty($options['printheading'])) {
+
+if ($poll->printheading && !empty($poll->name)) {
     echo $OUTPUT->heading(format_string($poll->name), 2);
 }
 
-if (!empty($options['printintro'])) {
-    if (trim(strip_tags($poll->intro))) {
-        echo $OUTPUT->box_start('mod_introbox', 'pollintro');
-        echo format_module_intro('poll', $poll, $cm->id);
-        echo $OUTPUT->box_end();
-    }
+if ($poll->printintro && !empty($poll->intro)) {
+    echo $OUTPUT->box(format_module_intro('poll', $poll, $cm->id), 'generalbox mod_introbox', 'pollintro');
 }
 
-$config = get_config('poll');
+// Our page content is just an iframe containing the Brookes Polls app.
 
+$config = get_config('poll');
 echo '<center><iframe width="' . $config->iframewidth . '" height="' . $config->iframeheight . '" src="https://polls.brookes.ac.uk/#/poll/' . $poll->number . '"></iframe></center>';
 
+// Finish the page.
 echo $OUTPUT->footer();

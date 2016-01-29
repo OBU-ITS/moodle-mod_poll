@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Poll activity - poll module upgrade code
+ * Poll activity - code to be executed during the module uninstallation
  *
  * @package    mod_poll
  * @author     Peter Welham
@@ -24,28 +24,12 @@
  */
 
 /**
- * This file keeps track of upgrades to the poll module
- *
- * Sometimes, changes between versions involve alterations to database
- * structures and other major things that may break installations. The upgrade
- * function in this file will attempt to perform all the necessary actions to
- * upgrade your older installation to the current version. If there's something
- * it cannot do itself, it will tell you what you need to do.  The commands in
- * here will all be database-neutral, using the functions defined in DLL libraries.
+ * @see uninstall_plugin()
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
- * Execute poll upgrade from the given old version
- *
- * @param int $oldversion
- * @return bool
+ * Custom uninstallation procedure
  */
-function xmldb_poll_upgrade($oldversion) {
-    global $DB;
-
-    $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
-
+function xmldb_poll_uninstall() {
     return true;
 }

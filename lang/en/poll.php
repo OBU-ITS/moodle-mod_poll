@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Poll activity - strings
+ * Poll activity - English strings
  *
  * @package    mod_poll
  * @author     Peter Welham
@@ -23,22 +23,29 @@
  *
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+$string['modulename'] = 'Poll';
+$string['modulenameplural'] = 'Polls';
+$string['modulename_help'] = 'The poll module enables a teacher to create a poll resource.';
+$string['pollname'] = 'Poll name';
+$string['pollname_help'] = 'The name that will appear as the course activity.';
+$string['poll'] = 'poll';
+$string['pluginadministration'] = 'Poll module administration';
+$string['pluginname'] = 'Poll';
+
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
+$string['displayopen'] = 'In page';
 $string['number'] = 'Poll number';
-$string['createpoll'] = 'Create a new poll resource';
+$string['createpoll'] = 'Create a new Poll resource';
 $string['displayoptions'] = 'Available display options';
 $string['displayselect'] = 'Display';
 $string['displayselectexplain'] = 'Select display type.';
-$string['modulename'] = 'Poll';
-$string['modulename_help'] = 'The poll module enables a teacher to create a poll resource.';
 $string['modulename_link'] = 'mod/poll/view';
-$string['modulenameplural'] = 'Polls';
 $string['optionsheader'] = 'Display options';
 $string['poll-mod-poll-x'] = 'Any poll module poll';
 $string['poll:addinstance'] = 'Add a new poll resource';
 $string['poll:view'] = 'View poll content';
-$string['pluginadministration'] = 'Poll module administration';
-$string['pluginname'] = 'Poll';
 $string['iframeheight'] = 'iFrame height (in pixels)';
 $string['iframeheightexplain'] = 'Specifies height of iframes.';
 $string['iframewidth'] = 'iFrame width (in pixels)';

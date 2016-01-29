@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Poll activity - the mod_poll course module viewed event
+ * Poll activity - redirect to the appropriate submission related page
  *
  * @package    mod_poll
  * @author     Peter Welham
@@ -23,24 +23,12 @@
  *
  */
 
-namespace mod_poll\event;
+require_once(__DIR__ . "../../../config.php");
 
-defined('MOODLE_INTERNAL') || die();
+$id = required_param('id', PARAM_INT);// Course module ID.
+// Item number may be != 0 for activities that allow more than one grade per user.
+$itemnumber = optional_param('itemnumber', 0, PARAM_INT);
+$userid = optional_param('userid', 0, PARAM_INT); // Graded user ID (optional).
 
-/**
- * The mod_poll instance list viewed event class
- *
- * If the view mode needs to be stored as well, you may need to
- * override methods get_url() and get_legacy_log_data(), too.
- *
- */
-class course_module_viewed extends \core\event\course_module_viewed {
-
-    /**
-     * Initialize the event
-     */
-    protected function init() {
-        $this->data['objecttable'] = 'poll';
-        parent::init();
-    }
-}
+// In the simplest case just redirect to the view page.
+redirect('view.php?id='.$id);

@@ -17,6 +17,7 @@
  * Poll activity - define the steps to perform one complete restore of the activity
  *
  * @package    mod_poll
+ * @category   backup
  * @author     Peter Welham
  * @copyright  2016, Oxford Brookes University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,26 +26,22 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/poll/backup/moodle2/restore_poll_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/poll/backup/moodle2/restore_poll_stepslib.php');
 
-/**
- * poll restore task that provides all the settings and steps to perform one
- * complete restore of the activity
- */
 class restore_poll_activity_task extends restore_activity_task {
 
     /**
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // label only has one structure step
+        // We have just one structure step here.
         $this->add_step(new restore_poll_activity_structure_step('poll_structure', 'poll.xml'));
     }
 
@@ -55,7 +52,7 @@ class restore_poll_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
 
-        $contents[] = new restore_decode_content('poll', array('intro', 'content'), 'poll');
+        $contents[] = new restore_decode_content('poll', array('intro'), 'poll');
 
         return $contents;
     }
@@ -67,8 +64,8 @@ class restore_poll_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         $rules = array();
 
-        $rules[] = new restore_decode_rule('POLLVIEWBYID', '/mod/poll/view.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('POLLINDEX', '/mod/poll/index.php?id=$1', 'course');
+        $rules[] = new restore_decode_rule('pollVIEWBYID', '/mod/poll/view.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('pollINDEX', '/mod/poll/index.php?id=$1', 'course');
 
         return $rules;
 

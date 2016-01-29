@@ -14,9 +14,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Poll activity - defines backup_poll_activity_task class
+ * Poll activity - provides the steps to perform one complete backup of the poll instance
  *
  * @package    mod_poll
+ * @category   backup
  * @author     Peter Welham
  * @copyright  2016, Oxford Brookes University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,7 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/mod/poll/backup/moodle2/backup_poll_stepslib.php');
 
 /**
- * Provides the steps to perform one complete backup of the Poll instance
+ * Defines backup_poll_activity_task class
  */
 class backup_poll_activity_task extends backup_activity_task {
 
@@ -54,15 +55,15 @@ class backup_poll_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot,"/");
+        $base = preg_quote($CFG->wwwroot, '/');
 
-        // Link to the list of polls
-        $search="/(".$base."\/mod\/poll\/index.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@POLLINDEX*$2@$', $content);
+        // Link to the list of polls.
+        $search = '/('.$base.'\/mod\/poll\/index.php\?id\=)([0-9]+)/';
+        $content = preg_replace($search, '$@pollINDEX*$2@$', $content);
 
-        // Link to poll view by moduleid
-        $search="/(".$base."\/mod\/poll\/view.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@POLLVIEWBYID*$2@$', $content);
+        // Link to poll view by moduleid.
+        $search = '/('.$base.'\/mod\/poll\/view.php\?id\=)([0-9]+)/';
+        $content = preg_replace($search, '$@pollVIEWBYID*$2@$', $content);
 
         return $content;
     }

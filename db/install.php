@@ -23,9 +23,25 @@
  *
  */
 
-defined('MOODLE_INTERNAL') || die;
+/**
+ *
+ * This file replaces the legacy STATEMENTS section in db/install.xml,
+ * lib.php/modulename_install() post installation hook and partially defaults.php.
+ *
+ */
 
+/**
+ * Post installation procedure
+ *
+ * @see upgrade_plugins_modules()
+ */
 function xmldb_poll_install() {
-    global $CFG;
+}
 
+/**
+ * Post installation recovery procedure
+ *
+ * @see upgrade_plugins_modules()
+ */
+function xmldb_poll_install_recovery() {
 }

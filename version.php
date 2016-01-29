@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Poll activity - version information
+ * Poll activity - version and other meta information
  *
  * @package    mod_poll
  * @author     Peter Welham
@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_poll';  // Full name of the plugin (used for diagnostics)
-$plugin->version  = 2016011600;   // The (date) version of this module + 2 extra digital for daily versions
-                                  // This version number is displayed into /admin/forms.php
-$plugin->requires = 2014110400;   // Requires this Moodle version
-$plugin->cron     = 0;
+$plugin->component = 'mod_poll';
+$plugin->version = 2016011800;
 $plugin->release = 'v1.0.0';
+$plugin->requires = 2014051200;
 $plugin->maturity = MATURITY_STABLE;
+$plugin->cron = 0;
+$plugin->dependencies = array();

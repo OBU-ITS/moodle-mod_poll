@@ -23,23 +23,28 @@
  *
  */
 
-defined('MOODLE_INTERNAL') || die;
+ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 require_once($CFG->dirroot . '/mod/poll/locallib.php');
-require_once($CFG->libdir . '/filelib.php');
 
 class mod_poll_mod_form extends moodleform_mod {
-    function definition() {
-        global $CFG, $DB;
+
+    /**
+     * Defines forms elements
+     */
+    public function definition() {
+        global $CFG;
 
         $mform = $this->_form;
-
+		
         $config = get_config('poll');
 
-        //-------------------------------------------------------
+        // Adding the "general" fieldset, where all the common settings are showed.
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '48'));
+
+        // Adding the standard "name" field.
+        $mform->addElement('text', 'name', get_string('pollname', 'poll'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -47,7 +52,14 @@ class mod_poll_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $this->add_intro_editor($config->requiremodintro);
+        $mform->addHelpButton('name', 'pollname', 'poll');
+
+        // Adding the standard "intro" and "introformat" fields.
+        if ($CFG->branch >= 29) {
+            $this->standard_intro_elements();
+        } else {
+            $this->add_intro_editor();
+        }
 
         //-------------------------------------------------------
         $mform->addElement('header', 'numbersection', get_string('number', 'poll'));
@@ -68,6 +80,12 @@ class mod_poll_mod_form extends moodleform_mod {
         } else {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
         }
+		
+		// override 'Open' string
+		if (isset($options[RESOURCELIB_DISPLAY_OPEN])) {
+			$options[RESOURCELIB_DISPLAY_OPEN] = get_string('displayopen', 'poll');
+		}
+		
         if (count($options) == 1) {
             $mform->addElement('hidden', 'display');
             $mform->setType('display', PARAM_INT);
@@ -78,38 +96,19 @@ class mod_poll_mod_form extends moodleform_mod {
             $mform->setDefault('display', $config->display);
         }
 
+        //-------------------------------------------------------
         $mform->addElement('advcheckbox', 'printheading', get_string('printheading', 'poll'));
         $mform->setDefault('printheading', $config->printheading);
         $mform->addElement('advcheckbox', 'printintro', get_string('printintro', 'poll'));
         $mform->setDefault('printintro', $config->printintro);
 
-        //-------------------------------------------------------
+        // Add standard grading elements.
+        $this->standard_grading_coursemodule_elements();
+
+        // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
 
-        //-------------------------------------------------------
+        // Add standard buttons, common to all modules.
         $this->add_action_buttons();
-
-        //-------------------------------------------------------
-        $mform->addElement('hidden', 'revision');
-        $mform->setType('revision', PARAM_INT);
-        $mform->setDefault('revision', 1);
-    }
-
-    function data_preprocessing(&$default_values) {
-        if ($this->current->instance) {
-            $draftitemid = file_get_submitted_draft_itemid('poll');
-            $default_values['poll']['number'] = null;
-            $default_values['poll']['itemid'] = $draftitemid;
-        }
-        if (!empty($default_values['displayoptions'])) {
-            $displayoptions = unserialize($default_values['displayoptions']);
-            if (isset($displayoptions['printheading'])) {
-                $default_values['printheading'] = $displayoptions['printheading'];
-            }
-            if (isset($displayoptions['printintro'])) {
-                $default_values['printintro'] = $displayoptions['printintro'];
-            }
-        }
     }
 }
-
