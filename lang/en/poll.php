@@ -34,6 +34,8 @@ $string['poll'] = 'poll';
 $string['pluginadministration'] = 'Poll module administration';
 $string['pluginname'] = 'Poll';
 
+$string['no_id'] = 'No module ID or poll ID';
+
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
 $string['displayopen'] = 'In page';
 $string['number'] = 'Poll number';

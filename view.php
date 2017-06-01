@@ -39,7 +39,7 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $poll->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('poll', $poll->id, $course->id, false, MUST_EXIST);
 } else {
-    error('You must specify a course_module ID or an instance ID');
+    print_error('no_id', 'mod_poll');
 }
 
 $inpopup = optional_param('inpopup', 0, PARAM_BOOL);

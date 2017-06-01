@@ -26,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_poll';
-$plugin->version = 2016011800;
-$plugin->release = 'v1.0.0';
+$plugin->version = 2017053100;
+$plugin->release = 'v1.0.1';
 $plugin->requires = 2014051200;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron = 0;
