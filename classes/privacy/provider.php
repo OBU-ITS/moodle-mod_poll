@@ -1,5 +1,7 @@
 <?php
 
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Poll activity - version and other meta information
+ * Poll activity - Privacy Subsystem implementation
  *
  * @package    mod_poll
  * @author     Peter Welham
@@ -23,12 +25,20 @@
  *
  */
 
+namespace mod_poll\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_poll';
-$plugin->version = 2018111800;
-$plugin->release = 'v1.0.2';
-$plugin->requires = 2014051200;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->cron = 0;
-$plugin->dependencies = array();
+// Privacy Subsystem implementing null_provider
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}

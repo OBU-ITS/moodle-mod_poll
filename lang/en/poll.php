@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['privacy:metadata'] = 'The Poll activity does not store any personal data.';
+
 $string['modulename'] = 'Poll';
 $string['modulenameplural'] = 'Polls';
 $string['modulename_help'] = 'The poll module enables a teacher to create a poll resource.';
